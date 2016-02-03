@@ -27,80 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
 
-import usb.core
-import usb.util
-
-def connect():
-	"""
-	Returns the list of compatible devices.
-
-	@return: device list
-	"""
-	ret = list()
-	ret += list(usb.core.find(find_all=True,
-		idVendor=0x04b4, idProduct=0xfd10))
-	ret += list(usb.core.find(find_all=True,
-		idVendor=0x04b4, idProduct=0xfd11))
-	ret += list(usb.core.find(find_all=True,
-		idVendor=0x04b4, idProduct=0xfd12))
-	ret += list(usb.core.find(find_all=True,
-		idVendor=0x04b4, idProduct=0xfd13))
-	return ret
-
-def getid(dev):
-	"""
-	Gets the id of a device.
-
-	@return: id
-	"""
-	buf = bytes([0x00, 0x00, 0x00, 0x00, 0x00]);
-	return dev.ctrl_transfer(0xa1, 0x01, 0x0301, 0, buf, 500)
-
-def getstatus(dev, i):
-	"""
-	Gets the status of a device.
-
-	@param dev: device
-	@return: status
-	"""
-	assert i >= 0 and i < 4
-	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00]);
-	buf = dev.ctrl_transfer(0xa1, 0x01, 0x0300 + 3 * i, 0, buf, 500)
-	return 1 & buf[1]
-
-def printid(id):
-	"""
-	Prints the id of a device.
-
-	@param id: id
-	"""
-	print("id = ", end="")
-	sep=""
-	for x in id:
-		print(sep, end="")
-		print(format(x, '02x'), end="")
-		sep=":"
-	print()
-
-def switchoff(dev, i):
-	"""
-	Switches device off.
-
-	@param dev: device
-	"""
-	assert i >= 0 and i < 4
-	buf = bytes([3 * i, 0x00, 0x00, 0x00, 0x00]);
-	buf = dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
-
-def switchon(dev, i):
-	"""
-	Switches device on.
-
-	@param dev: device
-	"""
-	assert i >= 0 and i < 4
-	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00]);
-	buf = dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
+from sispm.sispm import *
 
 # Find our devices.
 devices = connect()
@@ -117,7 +44,5 @@ for dev in devices:
 	# Print device id.
 	printid(getid(dev))
 	# Print status of all outlets.
-	for i in range(0, 4):
+	for i in range(1, 5):
 		print('\tstatus[{}] = {}'.format(i, getstatus(dev, i)))
-	# Switch off outlet 2.
-	switchoff(dev, 2)
