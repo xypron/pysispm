@@ -31,7 +31,7 @@ import sispm
 
 setup(
 	name='pysispm',
-	version='0.1-rc1',
+	version='0.1-rc2',
 	description='Python library for EnerGenie EG-PMS',
 	author='Heinrich Schuchardt',
 	author_email='xypron.glpk@gmx.de',

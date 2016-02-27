@@ -65,7 +65,16 @@ def getid(dev):
 	@return: id
 	"""
 	buf = bytes([0x00, 0x00, 0x00, 0x00, 0x00]);
-	return dev.ctrl_transfer(0xa1, 0x01, 0x0301, 0, buf, 500)
+	id =  dev.ctrl_transfer(0xa1, 0x01, 0x0301, 0, buf, 500)
+	if (len(id) == 0):
+		return None
+	ret = ''
+	sep = ''
+	for x in id:
+		ret += sep
+		ret += format(x, '02x')
+		sep = ':'
+	return ret
 
 def getstatus(dev, i):
 	"""
@@ -78,20 +87,6 @@ def getstatus(dev, i):
 	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00]);
 	buf = dev.ctrl_transfer(0xa1, 0x01, 0x0300 + 3 * i, 0, buf, 500)
 	return 1 & buf[1]
-
-def printid(id):
-	"""
-	Prints the id of a device.
-
-	@param id: id
-	"""
-	print("id = ", end="")
-	sep=""
-	for x in id:
-		print(sep, end="")
-		print(format(x, '02x'), end="")
-		sep=":"
-	print()
 
 def switchoff(dev, i):
 	"""

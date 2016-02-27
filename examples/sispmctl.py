@@ -42,7 +42,7 @@ for dev in devices:
 	# Set the active configuration.
 	dev.set_configuration(1)
 	# Print device id.
-	printid(getid(dev))
+	print(getid(dev))
 	# Print status of all outlets.
 	for i in range(1, 5):
 		print('\tstatus[{}] = {}'.format(i, getstatus(dev, i)))
