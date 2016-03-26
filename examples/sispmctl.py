@@ -35,7 +35,7 @@ devices = connect()
 # Were they found?
 if len(devices) == 0:
 	print('No device found')
-	exit
+	exit()
 
 for dev in devices:
 	print('device {}'.format(devices.index(dev)), end=", ")
