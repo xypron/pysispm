@@ -27,10 +27,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
 
-from sispm.sispm import *
+import sispm
 
 # Find our devices.
-devices = connect()
+devices = sispm.connect()
 
 # Were they found?
 if len(devices) == 0:
@@ -42,7 +42,7 @@ for dev in devices:
 	# Set the active configuration.
 	dev.set_configuration(1)
 	# Print device id.
-	print(getid(dev))
+	print(sispm.getid(dev))
 	# Print status of all outlets.
 	for i in range(1, 5):
-		print('\tstatus[{}] = {}'.format(i, getstatus(dev, i)))
+		print('\tstatus[{}] = {}'.format(i, sispm.getstatus(dev, i)))
