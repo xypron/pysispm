@@ -26,7 +26,7 @@
 
 """Controling EnerGenie EG-PMS
 
-A library to control the EnerGenie EG-PMS multiple socket outlet.
+A library to control the EnerGenie multi-outlet power strips.
 
 The EG-PMS has an USB interface. Four outlets (numbered 1 - 4) can be switched
 on and off via USB.
@@ -74,35 +74,65 @@ def getid(dev):
 		sep = ':'
 	return ret
 
+def getmaxport(dev):
+	"""
+	Gets the maximum outlet number of a device.
+
+	@return: maximum outlet number
+	"""
+	assert dev.idVendor == 0x04b4
+
+	if dev.idProduct == 0xfd10:
+		return 0
+	if dev.idProduct == 0xfd11:
+		return 1
+	return 4
+
+def getminport(dev):
+	"""
+	Gets the minimum outlet number of a device.
+
+	@return: minimum outlet number
+	"""
+
+	assert dev.idVendor == 0x04b4
+
+	if dev.idProduct == 0xfd10:
+		return 0
+	return 1
+
 def getstatus(dev, i):
 	"""
-	Gets the status of a device.
+	Gets the status of outlet i of the device.
 
 	@param dev: device
+	@param i: outlet
 	@return: status
 	"""
-	assert i >= 1 and i < 5
+	assert i >= getminport(dev) and i <= getmaxport(dev)
 	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00]);
 	buf = dev.ctrl_transfer(0xa1, 0x01, 0x0300 + 3 * i, 0, buf, 500)
 	return 1 & buf[1]
 
 def switchoff(dev, i):
 	"""
-	Switches device off.
+	Switches outlet i of the device off.
 
 	@param dev: device
+	@param i: outlet
 	"""
-	assert i >= 1 and i < 5
+	assert i >= getminport(dev) and i <= getmaxport(dev)
 	buf = bytes([3 * i, 0x00, 0x00, 0x00, 0x00]);
 	buf = dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
 
 def switchon(dev, i):
 	"""
-	Switches device on.
+	Switches outlet i of the device on.
 
 	@param dev: device
+	@param i: outlet
 	"""
-	assert i >= 1 and i < 5
+	assert i >= getminport(dev) and i <= getmaxport(dev)
 	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00]);
 	buf = dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
 

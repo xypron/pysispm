@@ -44,5 +44,5 @@ for dev in devices:
 	# Print device id.
 	print(sispm.getid(dev))
 	# Print status of all outlets.
-	for i in range(1, 5):
+	for i in range(sispm.getminport(dev), 1 + sispm.getmaxport(dev)):
 		print('\tstatus[{}] = {}'.format(i, sispm.getstatus(dev, i)))
