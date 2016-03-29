@@ -51,7 +51,7 @@ The library depends on PyUSB (https://github.com/walac/pyusb).
 		'Development Status :: 4 - Beta',
 		'Intended Audience :: Developers',
 		'License :: OSI Approved :: BSD License',
-		'Operating System :: POSIX'
+		'Operating System :: POSIX',
 		'Programming Language :: Python :: 3',
 		'Topic :: System :: Hardware :: Hardware Drivers'
 	]
