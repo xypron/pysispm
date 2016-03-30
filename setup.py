@@ -32,7 +32,7 @@ import sispm
 setup(
 	name='pysispm',
 	version='0.1',
-	description='Python library for EnerGenie EG-PMS',
+	description='Library for EnerGenie USB controlled powerstrips',
 	author='Heinrich Schuchardt',
 	author_email='xypron.glpk@gmx.de',
 	license = 'BSD',
@@ -41,11 +41,25 @@ setup(
 	install_requires=["pyusb >= 1.0.0a"],
 	long_description =
 """
-PySisPM is a library to control the EnerGenie EG-PMS multiple socket outlet.
-
-The EG-PMS has an USB interface. Four outlets can be switched on and off via USB.
+PySisPM is a library to control the EnerGenie EG-PMS and EG-PM2 multiple socket
+powerstrips. The outlets can be switched on and off via USB.
 
 The library depends on PyUSB (https://github.com/walac/pyusb).
+
+Per default, only root is allowed to use devices directly,
+therefore the library also only works as root.
+
+To allow group sispmctl access copy file /lib/udev/rules.d/60-sispmctl.rules
+with the following content
+
+SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd10", GROUP="sispmctl", MODE="660"
+SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd11", GROUP="sispmctl", MODE="660"
+SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd12", GROUP="sispmctl", MODE="660"
+SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd13", GROUP="sispmctl", MODE="660"
+
+Then reload the udev rules with
+
+udevadm control --reload-rules
 """,
 	classifiers=[
 		'Development Status :: 4 - Beta',
