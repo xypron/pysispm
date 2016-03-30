@@ -48,23 +48,28 @@ def checkport(dev, p):
 	return True
 
 def main():
-	try:
-		opts, args = getopt.getopt(sys.argv[1:], "D:d:f:ho:")
-	except getopt.GetoptError as err:
-		print(str(err))
-		usage()
-		sys.exit(2)
 	# Find our devices.
 	devices = sispm.connect()
 	# Were they found?
 	if len(devices) == 0:
 		print('No device found')
-		exit(1)
+		sys.exit(1)
+
+	# If there is only one device, use it as default.
 	if len(devices) == 1:
 		dev = devices[0]
 	else:
 		dev = None
 
+	# Define command line options.
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "D:d:f:ho:t:")
+	except getopt.GetoptError as err:
+		print(str(err))
+		usage()
+		sys.exit(2)
+
+	# Handle command line.
 	for o, a in opts:
 		if o == "-D":
 			dev = None
@@ -93,10 +98,21 @@ def main():
 			if not checkport(dev, p):
 				break
 			sispm.switchon(dev, p)
+		elif o == "-t":
+			p = int(a)
+			if not checkport(dev, p):
+				break
+			if sispm.getstatus(dev, p) == 0:
+				sispm.switchon(dev, p)
+			else:
+				sispm.switchoff(dev, p)
 		else:
 			break
 
+	# Always output the device status.
 	status(devices)
+
+	# Workaround for bug in old version of usb library.
 	devices = None
 
 def status(devices):
@@ -125,6 +141,7 @@ def usage():
 	print("  -f OUTLET     switch outlet off")
 	print("  -h            print this help")
 	print("  -o OUTLET     switch outlet on")
+	print("  -t OUTLET     toggle outlet")
 
 if __name__ == "__main__":
 	main()
