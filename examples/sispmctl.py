@@ -133,7 +133,7 @@ def usage():
 	"""
 	Outputs the online help.
 	"""
-	print("Usage: sispm [OPTIONS]")
+	print("Usage: sispmctl.py [OPTIONS]")
 	print("Switches Enermax USB controlled plugstrips")
 	print()
 	print("  -D ID         id of device to be controlled")
