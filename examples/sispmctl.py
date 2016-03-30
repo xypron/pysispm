@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-file sispmctl.py - controling EnerGenie EG-PMS
+file sispmctl.py - controlling EnerGenie EG-PMS
 
 Copyright (c) 2016, Heinrich Schuchardt <xypron.glpk@gmx.de>
 All rights reserved.
@@ -27,22 +27,105 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
 
+import getopt
 import sispm
+import sys
 
-# Find our devices.
-devices = sispm.connect()
+def checkport(dev, p):
+	"""
+	Checks if port p exists on the device.
 
-# Were they found?
-if len(devices) == 0:
-	print('No device found')
-	exit()
+	@param dev device
+	@param p port
+	@return port exists
+	"""
+	pmin = sispm.getminport(dev)
+	pmax = sispm.getmaxport(dev)
+	if p < pmin or p > pmax:
+		print("Device {} only has ports {}..{}".format(
+			sispm.getid(dev), pmin, pmax))
+		return False
+	return True
 
-for dev in devices:
-	print('device {}'.format(devices.index(dev)), end=", ")
-	# Set the active configuration.
-	dev.set_configuration(1)
-	# Print device id.
-	print(sispm.getid(dev))
-	# Print status of all outlets.
-	for i in range(sispm.getminport(dev), 1 + sispm.getmaxport(dev)):
-		print('\tstatus[{}] = {}'.format(i, sispm.getstatus(dev, i)))
+def main():
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "D:d:f:ho:")
+	except getopt.GetoptError as err:
+		print(str(err))
+		usage()
+		sys.exit(2)
+	# Find our devices.
+	devices = sispm.connect()
+	# Were they found?
+	if len(devices) == 0:
+		print('No device found')
+		exit(1)
+	if len(devices) == 1:
+		dev = devices[0]
+	else:
+		dev = None
+
+	for o, a in opts:
+		if o == "-D":
+			dev = None
+			for dev in devices:
+				if sispm.getid(dev) == a:
+					break
+			if dev == None:
+				print("device with id {} not found".format(a))
+				break
+		elif o == "-d":
+			d = int(a)
+			if d < 0 or d >= len(devices):
+				print("unknown device {}".format(d))
+				break
+			dev = devices[d];
+		elif o == "-f":
+			p = int(a)
+			if not checkport(dev, p):
+				break
+			sispm.switchoff(dev, p)
+		elif o == "-h":
+			usage()
+			print()
+		elif o == "-o":
+			p = int(a)
+			if not checkport(dev, p):
+				break
+			sispm.switchon(dev, p)
+		else:
+			break
+
+	status(devices)
+	devices = None
+
+def status(devices):
+	"""
+	Outputs the status of all devices.
+
+	@param devices list of devices
+	"""
+	for dev in devices:
+		print('device {}'.format(devices.index(dev)), end=", ")
+		# Print device id.
+		print(sispm.getid(dev))
+		# Print status of all outlets.
+		for i in range(sispm.getminport(dev), 1 + sispm.getmaxport(dev)):
+			print('\tstatus[{}] = {}'.format(i, sispm.getstatus(dev, i)))
+
+def usage():
+	"""
+	Outputs the online help.
+	"""
+	print("Usage: sispm [OPTIONS]")
+	print("Switches Enermax USB controlled plugstrips")
+	print()
+	print("  -D ID         id of device to be controlled")
+	print("  -d DEVICE     index of device to be controlled")
+	print("  -f OUTLET     switch outlet off")
+	print("  -h            print this help")
+	print("  -o OUTLET     switch outlet on")
+
+if __name__ == "__main__":
+	main()
+
