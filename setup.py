@@ -31,7 +31,7 @@ import sispm
 
 setup(
 	name='pysispm',
-	version='0.1',
+	version='0.2',
 	description='Library for EnerGenie USB controlled powerstrips',
 	author='Heinrich Schuchardt',
 	author_email='xypron.glpk@gmx.de',
