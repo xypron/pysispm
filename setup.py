@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2016, Heinrich Schuchardt <xypron.glpk@gmx.de>
 # All rights reserved.
