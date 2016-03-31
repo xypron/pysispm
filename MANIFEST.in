@@ -1,0 +1,4 @@
+recursive-include sispm *.py
+include examples/60-sispmctl.rules
+include examples/printenv.py
+include examples/sispmctl.py
