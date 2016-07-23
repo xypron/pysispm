@@ -50,6 +50,7 @@ def checkport(dev, p):
 def main():
 	# Find our devices.
 	devices = sispm.connect()
+
 	# Were they found?
 	if len(devices) == 0:
 		print('No device found')
@@ -73,8 +74,9 @@ def main():
 	for o, a in opts:
 		if o == "-D":
 			dev = None
-			for dev in devices:
-				if sispm.getid(dev) == a:
+			for d in devices:
+				if sispm.getid(d) == a:
+					dev = d
 					break
 			if dev == None:
 				print("device with id {} not found".format(a))
