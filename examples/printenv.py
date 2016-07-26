@@ -32,8 +32,9 @@ This example demonstrates how to access U-Boot when a computer is being
 switched on.
 
 After toggling power off and on the script waits for serial output from
-U-Boot to appear. It issues a CR to enter U-Boot. The printenv command is used
-to print the environment variables. At last the computer is switched off again.
+U-Boot to appear. It issues two CRs to enter U-Boot. The printenv command is
+used to print the environment variables. At last the computer is switched off
+again.
 
 Please, adjust device id, outlet number and serial port as required.
 """
@@ -62,7 +63,7 @@ def skip_output(ser, test = None):
 		if (c[0] == 0x0d):
 			print(line)
 			line = ''
-		elif (c[0] >= 32):
+		elif (c[0] >= 32 and c[0] < 128):
 			line += chr(c[0])
 			if (test and line.find(test) != -1):
 				break
@@ -108,11 +109,11 @@ print("== Switching on ==")
 sispm.switchon(dev, port)
 
 # Wait for U-Boot message
-skip_output(ser, 'Hit any key to stop autoboot:')
+skip_output(ser, 'stop autoboot:')
 
 # Stop boot process
-ser.write(b'\n')
-skip_output(ser, ">")
+ser.write(b'\r\r')
+skip_output(ser)
 
 # Print environment
 ser.write(b'printenv\n')
