@@ -43,6 +43,7 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd10", GROUP="sispmc
 SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd11", GROUP="sispmctl", MODE="660"
 SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd12", GROUP="sispmctl", MODE="660"
 SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd13", GROUP="sispmctl", MODE="660"
+SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="fd15", GROUP="sispmctl", MODE="660"
 
 Then reload the udev rules with
 
@@ -69,6 +70,8 @@ def connect():
 		idVendor=0x04b4, idProduct=0xfd12))
 	ret += list(usb.core.find(find_all=True,
 		idVendor=0x04b4, idProduct=0xfd13))
+	ret += list(usb.core.find(find_all=True,
+		idVendor=0x04b4, idProduct=0xfd15))
 	return ret
 
 def getid(dev):
