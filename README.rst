@@ -10,6 +10,8 @@ On Debian PyUSB can be installed using::
 
     apt-get install python3-usb
 
+This libary does not support Python 2.
+
 Examples
 --------
 
