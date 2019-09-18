@@ -52,8 +52,21 @@ udevadm control --reload-rules
 SisPM is licensed under a modified BSD license.
 """
 
+import time
 import usb.core
 import usb.util
+
+def _send_ctrl_transfer(dev, bmRequestType, bRequest, wValue, wIndex,
+			data_or_wLength, timeout):
+	TRIES = 5
+	for _ in range(TRIES):
+		buf = dev.ctrl_transfer(bmRequestType, bRequest, wValue,
+			wIndex, data_or_wLength, timeout)
+		if bmRequestType & usb.util.CTRL_IN and len(buf) == 0:
+			time.sleep(0.05)
+			continue
+		return buf
+	return None
 
 def connect():
 	"""
@@ -81,8 +94,8 @@ def getid(dev):
 	@return: id
 	"""
 	buf = bytes([0x00, 0x00, 0x00, 0x00, 0x00])
-	id =  dev.ctrl_transfer(0xa1, 0x01, 0x0301, 0, buf, 500)
-	if len(id) == 0:
+	id = _send_ctrl_transfer(dev, 0xa1, 0x01, 0x0301, 0, buf, 500)
+	if id is None:
 		return None
 	ret = ''
 	sep = ''
@@ -129,7 +142,9 @@ def getstatus(dev, i):
 	"""
 	assert i >= getminport(dev) and i <= getmaxport(dev)
 	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00])
-	buf = dev.ctrl_transfer(0xa1, 0x01, 0x0300 + 3 * i, 0, buf, 500)
+	buf = _send_ctrl_transfer(dev, 0xa1, 0x01, 0x0300 + 3 * i, 0, buf, 500)
+	if buf is None:
+		return None
 	return 1 & buf[1]
 
 def switchoff(dev, i):
@@ -141,7 +156,7 @@ def switchoff(dev, i):
 	"""
 	assert i >= getminport(dev) and i <= getmaxport(dev)
 	buf = bytes([3 * i, 0x00, 0x00, 0x00, 0x00])
-	dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
+	_send_ctrl_transfer(dev, 0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
 
 def switchon(dev, i):
 	"""
@@ -152,4 +167,4 @@ def switchon(dev, i):
 	"""
 	assert i >= getminport(dev) and i <= getmaxport(dev)
 	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00])
-	dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
+	_send_ctrl_transfer(dev, 0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
