@@ -34,7 +34,7 @@ on and off via USB.
 The library depends on PyUSB (https://github.com/walac/pyusb).
 
 Per default, only root is allowed to use devices directly,
-therefore the library also only works as root. 
+therefore the library also only works as root.
 
 To allow group sispmctl access copy file /lib/udev/rules.d/60-sispmctl.rules
 with the following content
@@ -80,9 +80,9 @@ def getid(dev):
 
 	@return: id
 	"""
-	buf = bytes([0x00, 0x00, 0x00, 0x00, 0x00]);
+	buf = bytes([0x00, 0x00, 0x00, 0x00, 0x00])
 	id =  dev.ctrl_transfer(0xa1, 0x01, 0x0301, 0, buf, 500)
-	if (len(id) == 0):
+	if len(id) == 0:
 		return None
 	ret = ''
 	sep = ''
@@ -128,7 +128,7 @@ def getstatus(dev, i):
 	@return: status
 	"""
 	assert i >= getminport(dev) and i <= getmaxport(dev)
-	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00]);
+	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00])
 	buf = dev.ctrl_transfer(0xa1, 0x01, 0x0300 + 3 * i, 0, buf, 500)
 	return 1 & buf[1]
 
@@ -140,8 +140,8 @@ def switchoff(dev, i):
 	@param i: outlet
 	"""
 	assert i >= getminport(dev) and i <= getmaxport(dev)
-	buf = bytes([3 * i, 0x00, 0x00, 0x00, 0x00]);
-	buf = dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
+	buf = bytes([3 * i, 0x00, 0x00, 0x00, 0x00])
+	dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
 
 def switchon(dev, i):
 	"""
@@ -151,6 +151,5 @@ def switchon(dev, i):
 	@param i: outlet
 	"""
 	assert i >= getminport(dev) and i <= getmaxport(dev)
-	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00]);
-	buf = dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
-
+	buf = bytes([3 * i, 0x03, 0x00, 0x00, 0x00])
+	dev.ctrl_transfer(0x21, 0x09, 0x0300 + 3 * i, 0, buf, 500)
