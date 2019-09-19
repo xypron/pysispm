@@ -52,6 +52,7 @@ udevadm control --reload-rules
 SisPM is licensed under a modified BSD license.
 """
 
+import sys
 import time
 import usb.core
 import usb.util
@@ -60,12 +61,16 @@ def _send_ctrl_transfer(dev, bmRequestType, bRequest, wValue, wIndex,
 			data_or_wLength, timeout):
 	TRIES = 5
 	for _ in range(TRIES):
-		buf = dev.ctrl_transfer(bmRequestType, bRequest, wValue,
-			wIndex, data_or_wLength, timeout)
-		if bmRequestType & usb.util.CTRL_IN and len(buf) == 0:
-			time.sleep(0.05)
+		try:
+			buf = dev.ctrl_transfer(bmRequestType, bRequest, wValue,
+				wIndex, data_or_wLength, timeout)
+			if bmRequestType & usb.util.CTRL_IN and len(buf) == 0:
+				time.sleep(0.05)
+				continue
+		except usb.core.USBError as e:
 			continue
 		return buf
+	print('pysispm: I/O error', file=sys.stderr)
 	return None
 
 def connect():
@@ -91,7 +96,7 @@ def getid(dev):
 	"""
 	Gets the id of a device.
 
-	@return: id
+	@return: id, none in case of I/O error
 	"""
 	buf = bytes([0x00, 0x00, 0x00, 0x00, 0x00])
 	id = _send_ctrl_transfer(dev, 0xa1, 0x01, 0x0301, 0, buf, 500)
