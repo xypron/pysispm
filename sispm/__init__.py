@@ -53,7 +53,6 @@ SisPM is licensed under a modified BSD license.
 """
 
 import sys
-import time
 import usb.core
 import usb.util
 
@@ -65,7 +64,6 @@ def _send_ctrl_transfer(dev, bmRequestType, bRequest, wValue, wIndex,
 			buf = dev.ctrl_transfer(bmRequestType, bRequest, wValue,
 				wIndex, data_or_wLength, timeout)
 			if bmRequestType & usb.util.CTRL_IN and len(buf) == 0:
-				time.sleep(0.05)
 				continue
 		except usb.core.USBError as e:
 			continue
